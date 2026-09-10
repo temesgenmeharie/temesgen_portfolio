@@ -92,7 +92,7 @@ export default function Hero() {
               href="#contact"
               className="px-6 py-2.5 bg-slate-800 border border-slate-600 text-white dark:bg-black dark:border-white/20 dark:hover:bg-white/10 dark:hover:border-white/40 hover:bg-slate-700 transition-all text-sm flex items-center justify-center min-w-[110px] rounded-md"
             >
-              Hire Me
+              Let's Work Together
             </a>
           </div>
 
