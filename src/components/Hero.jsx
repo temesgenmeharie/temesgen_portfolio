@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FiDownload, FiX, FiUser, FiMail, FiBriefcase, FiMessageSquare } from "react-icons/fi";
 import {
