@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FiDownload, FiX, FiUser, FiMail, FiBriefcase, FiMessageSquare } from "react-icons/fi";
 import {
   SiReact, SiHtml5, SiCss3, SiTailwindcss, SiJavascript,
   SiNodedotjs, SiExpress, SiPostgresql, SiMysql, SiFlutter
 } from "react-icons/si";
-const cvFile = "/resume.pdf";
+
+// PDF is imported as a Vite asset — Vite gives it a hashed URL (e.g. /assets/resume-Abc123.pdf)
+// The URL is never exposed in the DOM. It is only used programmatically after form submission.
+import cvFile from "../assets/resume.pdf";
 
 const TECH_BADGES = [
   { name: "React", icon: SiReact, color: "#61DAFB", labelColor: "#0ea5e9", bg: "rgba(97, 218, 251, 0.12)", border: "rgba(97, 218, 251, 0.25)" },
