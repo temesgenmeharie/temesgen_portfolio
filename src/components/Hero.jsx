@@ -66,15 +66,14 @@ export default function Hero() {
     const errs = validate();
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     setErrors({});
+    // Trigger download immediately inside the user gesture — browsers block it if deferred via setTimeout
+    triggerDownload();
     setSubmitted(true);
     setTimeout(() => {
-      triggerDownload();
-      setTimeout(() => {
-        setShowResumeModal(false);
-        setSubmitted(false);
-        setFormData({ name: "", email: "", company: "", reason: "" });
-      }, 1000);
-    }, 600);
+      setShowResumeModal(false);
+      setSubmitted(false);
+      setFormData({ name: "", email: "", company: "", reason: "" });
+    }, 1500);
   };
 
   const handleClose = () => {
