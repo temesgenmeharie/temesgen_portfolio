@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { FiDownload } from "react-icons/fi";
+import { FiDownload, FiX, FiUser, FiMail, FiBriefcase, FiMessageSquare } from "react-icons/fi";
 import {
   SiReact, SiHtml5, SiCss3, SiTailwindcss, SiJavascript,
   SiNodedotjs, SiExpress, SiPostgresql, SiMysql, SiFlutter
@@ -24,13 +24,15 @@ const TECH_BADGES = [
 ];
 
 export default function Hero() {
-  // Reactive dark-mode state — updates whenever the theme toggle fires
   const [isDark, setIsDark] = useState(
     document.documentElement.classList.contains("dark")
   );
   const [showResumeModal, setShowResumeModal] = useState(false);
+  const [formData, setFormData] = useState({ name: "", email: "", company: "", reason: "" });
+  const [errors, setErrors] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+  const downloadRef = useRef(null);
 
-  // Watch for dark class changes on <html>
   useEffect(() => {
     const observer = new MutationObserver(() => {
       setIsDark(document.documentElement.classList.contains("dark"));
@@ -38,6 +40,46 @@ export default function Hero() {
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
     return () => observer.disconnect();
   }, []);
+
+  const validate = () => {
+    const e = {};
+    if (!formData.name.trim()) e.name = "Name is required";
+    if (!formData.email.trim()) e.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) e.email = "Enter a valid email";
+    if (!formData.reason) e.reason = "Please select a reason";
+    return e;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const errs = validate();
+    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+    setErrors({});
+    setSubmitted(true);
+    // trigger the hidden anchor after state update
+    setTimeout(() => {
+      downloadRef.current?.click();
+      setTimeout(() => {
+        setShowResumeModal(false);
+        setSubmitted(false);
+        setFormData({ name: "", email: "", company: "", reason: "" });
+      }, 1000);
+    }, 600);
+  };
+
+  const handleClose = () => {
+    setShowResumeModal(false);
+    setSubmitted(false);
+    setErrors({});
+    setFormData({ name: "", email: "", company: "", reason: "" });
+  };
+
+  const inputClass = (field) =>
+    `w-full px-4 py-2.5 rounded-lg text-sm bg-slate-50 dark:bg-white/5 border ${
+      errors[field]
+        ? "border-red-400 focus:ring-red-400"
+        : "border-slate-200 dark:border-white/10 focus:ring-emerald-500"
+    } text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:ring-2 transition-all`;
 
   return (
     <section id="hero" className="min-h-screen flex items-center pt-24 pb-20 relative overflow-hidden bg-[var(--bg)] transition-colors duration-300">
@@ -142,52 +184,161 @@ export default function Hero() {
 
       </div>
 
-      {/* Resume Download Confirmation Modal */}
+      {/* Hidden download anchor — triggered programmatically after form submit */}
+      <a ref={downloadRef} href={cvFile} download="Temesgen-Meharie-Resume.pdf" className="hidden" aria-hidden="true" />
+
+      {/* Resume Download Form Modal */}
       {showResumeModal && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
-          onClick={() => setShowResumeModal(false)}
+          onClick={handleClose}
         >
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center"
+            initial={{ scale: 0.92, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.92, opacity: 0, y: 20 }}
+            transition={{ type: "spring", stiffness: 300, damping: 26 }}
+            className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-8 max-w-md w-full"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Icon */}
-            <div className="w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mx-auto mb-4">
-              <FiDownload className="text-2xl text-emerald-600 dark:text-emerald-400" />
-            </div>
-
-            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">
-              Download Resume?
-            </h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
-              You're about to download <span className="font-semibold text-slate-700 dark:text-slate-200">Temesgen Meharie's</span> resume as a PDF file. Would you like to proceed?
-            </p>
-
-            <div className="flex gap-3">
+            {/* Header */}
+            <div className="flex items-start justify-between mb-5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+                  <FiDownload className="text-lg text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-800 dark:text-white leading-tight">
+                    Before You Download
+                  </h3>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+                    Quick form — takes 10 seconds
+                  </p>
+                </div>
+              </div>
               <button
-                onClick={() => setShowResumeModal(false)}
-                className="flex-1 px-4 py-2.5 rounded-lg border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-white/5 transition-all"
+                onClick={handleClose}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors mt-0.5"
+                aria-label="Close"
               >
-                Cancel
+                <FiX className="text-lg" />
               </button>
-              <a
-                href={cvFile}
-                download="Temesgen-Meharie-Resume.pdf"
-                onClick={() => setShowResumeModal(false)}
-                className="flex-1 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-all flex items-center justify-center gap-2"
-              >
-                <FiDownload />
-                Yes, Download
-              </a>
             </div>
+
+            {submitted ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex flex-col items-center py-6 text-center"
+              >
+                <div className="w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-3">
+                  <FiDownload className="text-2xl text-emerald-600 dark:text-emerald-400 animate-bounce" />
+                </div>
+                <p className="text-sm font-semibold text-slate-800 dark:text-white">Downloading now...</p>
+                <p className="text-xs text-slate-400 mt-1">Thanks, {formData.name.split(" ")[0]}!</p>
+              </motion.div>
+            ) : (
+              <form onSubmit={handleSubmit} noValidate className="space-y-4">
+
+                {/* Name */}
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1.5">
+                    Full Name <span className="text-red-400">*</span>
+                  </label>
+                  <div className="relative">
+                    <FiUser className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none" />
+                    <input
+                      type="text"
+                      placeholder="e.g. John Smith"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className={`${inputClass("name")} pl-9`}
+                    />
+                  </div>
+                  {errors.name && <p className="text-xs text-red-400 mt-1">{errors.name}</p>}
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1.5">
+                    Email Address <span className="text-red-400">*</span>
+                  </label>
+                  <div className="relative">
+                    <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none" />
+                    <input
+                      type="email"
+                      placeholder="you@example.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className={`${inputClass("email")} pl-9`}
+                    />
+                  </div>
+                  {errors.email && <p className="text-xs text-red-400 mt-1">{errors.email}</p>}
+                </div>
+
+                {/* Company (optional) */}
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1.5">
+                    Company / Organization <span className="text-slate-400 font-normal">(optional)</span>
+                  </label>
+                  <div className="relative">
+                    <FiBriefcase className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none" />
+                    <input
+                      type="text"
+                      placeholder="e.g. Acme Corp"
+                      value={formData.company}
+                      onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                      className={`${inputClass("company")} pl-9`}
+                    />
+                  </div>
+                </div>
+
+                {/* Reason */}
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1.5">
+                    Why are you downloading? <span className="text-red-400">*</span>
+                  </label>
+                  <div className="relative">
+                    <FiMessageSquare className="absolute left-3 top-3 text-slate-400 text-sm pointer-events-none" />
+                    <select
+                      value={formData.reason}
+                      onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+                      className={`${inputClass("reason")} pl-9 appearance-none cursor-pointer`}
+                    >
+                      <option value="">Select a reason...</option>
+                      <option value="hiring">Considering for a job opportunity</option>
+                      <option value="freelance">Freelance / contract work</option>
+                      <option value="collaboration">Project collaboration</option>
+                      <option value="networking">General networking</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  {errors.reason && <p className="text-xs text-red-400 mt-1">{errors.reason}</p>}
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3 pt-1">
+                  <button
+                    type="button"
+                    onClick={handleClose}
+                    className="flex-1 px-4 py-2.5 rounded-lg border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-white/5 transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-sm font-medium transition-all flex items-center justify-center gap-2"
+                  >
+                    <FiDownload />
+                    Download CV
+                  </button>
+                </div>
+
+              </form>
+            )}
           </motion.div>
         </motion.div>
       )}
