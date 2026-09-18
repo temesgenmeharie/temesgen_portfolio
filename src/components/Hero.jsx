@@ -28,6 +28,7 @@ export default function Hero() {
   const [isDark, setIsDark] = useState(
     document.documentElement.classList.contains("dark")
   );
+  const [showResumeModal, setShowResumeModal] = useState(false);
 
   // Watch for dark class changes on <html>
   useEffect(() => {
@@ -78,16 +79,13 @@ export default function Hero() {
 
           {/* Action Buttons */}
           <div className="flex flex-wrap gap-4 mb-8">
-            <a
-              href={cvFile}
-              target="_blank"
-              rel="noreferrer"
-              download="resume.pdf"
+            <button
+              onClick={() => setShowResumeModal(true)}
               className="px-6 py-2.5 bg-slate-800 border border-slate-600 text-white dark:bg-black dark:border-white/20 dark:hover:bg-white/10 dark:hover:border-white/40 hover:bg-slate-700 transition-all text-sm flex items-center gap-2 rounded-md"
             >
               <FiDownload />
               Download CV
-            </a>
+            </button>
             <a
               href="#contact"
               className="px-6 py-2.5 bg-slate-800 border border-slate-600 text-white dark:bg-black dark:border-white/20 dark:hover:bg-white/10 dark:hover:border-white/40 hover:bg-slate-700 transition-all text-sm flex items-center justify-center min-w-[110px] rounded-md"
@@ -143,6 +141,56 @@ export default function Hero() {
         </motion.div>
 
       </div>
+
+      {/* Resume Download Confirmation Modal */}
+      {showResumeModal && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+          onClick={() => setShowResumeModal(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Icon */}
+            <div className="w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mx-auto mb-4">
+              <FiDownload className="text-2xl text-emerald-600 dark:text-emerald-400" />
+            </div>
+
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">
+              Download Resume?
+            </h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
+              You're about to download <span className="font-semibold text-slate-700 dark:text-slate-200">Temesgen Meharie's</span> resume as a PDF file. Would you like to proceed?
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowResumeModal(false)}
+                className="flex-1 px-4 py-2.5 rounded-lg border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 text-sm hover:bg-slate-50 dark:hover:bg-white/5 transition-all"
+              >
+                Cancel
+              </button>
+              <a
+                href={cvFile}
+                download="Temesgen-Meharie-Resume.pdf"
+                onClick={() => setShowResumeModal(false)}
+                className="flex-1 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-all flex items-center justify-center gap-2"
+              >
+                <FiDownload />
+                Yes, Download
+              </a>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
     </section>
   );
 }
