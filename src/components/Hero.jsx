@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FiDownload, FiX, FiUser, FiMail, FiBriefcase, FiMessageSquare } from "react-icons/fi";
 import {
@@ -31,7 +31,6 @@ export default function Hero() {
   const [formData, setFormData] = useState({ name: "", email: "", company: "", reason: "" });
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
-  const downloadRef = useRef(null);
 
   useEffect(() => {
     const observer = new MutationObserver(() => {
@@ -50,15 +49,23 @@ export default function Hero() {
     return e;
   };
 
+  const triggerDownload = () => {
+    const link = document.createElement("a");
+    link.href = cvFile;
+    link.download = "Temesgen-Meharie-Resume.pdf";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     setErrors({});
     setSubmitted(true);
-    // trigger the hidden anchor after state update
     setTimeout(() => {
-      downloadRef.current?.click();
+      triggerDownload();
       setTimeout(() => {
         setShowResumeModal(false);
         setSubmitted(false);
@@ -183,9 +190,6 @@ export default function Hero() {
         </motion.div>
 
       </div>
-
-      {/* Hidden download anchor — triggered programmatically after form submit */}
-      <a ref={downloadRef} href={cvFile} download="Temesgen-Meharie-Resume.pdf" className="hidden" aria-hidden="true" />
 
       {/* Resume Download Form Modal */}
       {showResumeModal && (
