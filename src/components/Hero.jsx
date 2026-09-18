@@ -5,7 +5,7 @@ import {
   SiReact, SiHtml5, SiCss3, SiTailwindcss, SiJavascript,
   SiNodedotjs, SiExpress, SiPostgresql, SiMysql, SiFlutter
 } from "react-icons/si";
-import cvFile from "../assets/resume.pdf";
+const cvFile = "/resume.pdf";
 
 const TECH_BADGES = [
   { name: "React", icon: SiReact, color: "#61DAFB", labelColor: "#0ea5e9", bg: "rgba(97, 218, 251, 0.12)", border: "rgba(97, 218, 251, 0.25)" },
