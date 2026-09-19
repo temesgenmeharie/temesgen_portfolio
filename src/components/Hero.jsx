@@ -125,7 +125,7 @@ export default function Hero() {
 
           {/* Description */}
           <p className="text-slate-600 dark:text-[var(--text-muted)] text-sm md:text-base max-w-xl mb-8 leading-relaxed">
-            I design and develop responsive web applications that solve real-world problems. With a passion for clean code, intuitive user experiences, and continuous learning, I turn ideas into digital products that people enjoy using.
+            I design and develop responsive Full Stack web applications that solve real-world problems. With a passion for clean code, intuitive user experiences, and continuous learning, I turn ideas into digital products that people enjoy using.
           </p>
 
           {/* Action Buttons */}
