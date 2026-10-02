@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiMenu, FiX, FiGithub, FiLinkedin, FiTwitter, FiMoon, FiSun } from "react-icons/fi";
-import cvFile from "../assets/resume.pdf";
 
 const NAV_LINKS = [
   { name: "Home", href: "#hero" },
   { name: "About", href: "#about" },
-  { name: "Resume", href: cvFile, target: "_blank" },
+  { name: "Resume", href: "#" },
   { name: "Skills", href: "#skills" },
   { name: "Projects", href: "#projects" },
   { name: "Contact", href: "#contact" },
 ];
 
-export default function Navbar() {
+export default function Navbar({ onOpenResumeModal }) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
@@ -65,6 +64,14 @@ export default function Navbar() {
     return () => observer.disconnect();
   }, []);
 
+  const handleNavClick = (e, link) => {
+    if (link.name === "Resume") {
+      e.preventDefault();
+      onOpenResumeModal();
+      if (isOpen) setIsOpen(false);
+    }
+  };
+
   return (
     <nav
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? "glass py-3" : "bg-transparent py-5"
@@ -79,18 +86,18 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-6">
           {NAV_LINKS.map((link) => {
             const isLinkActive = activeSection === link.href.replace("#", "") || (link.name === "Home" && activeSection === "hero");
-            const isPdf = link.target === "_blank";
+            const isResume = link.name === "Resume";
             return (
               <a
                 key={link.name}
                 href={link.href}
-                target={isPdf ? "_blank" : undefined}
-                rel={isPdf ? "noreferrer" : undefined}
-                download={isPdf ? "resume.pdf" : undefined}
-                className={`text-sm font-medium transition-all px-4 py-1.5 rounded-full ${isLinkActive && !isPdf
+                onClick={(e) => handleNavClick(e, link)}
+                target={isResume ? undefined : (link.target || undefined)}
+                rel={isResume ? undefined : (link.target === "_blank" ? "noreferrer" : undefined)}
+                className={`text-sm font-medium transition-all px-4 py-1.5 rounded-full ${isLinkActive && !isResume
                   ? "border border-emerald-600/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
                   : "text-[var(--text-muted)] hover:text-[var(--text-main)]"
-                  }`}
+                  } cursor-pointer`}
               >
                 {link.name}
               </a>
@@ -131,8 +138,8 @@ export default function Navbar() {
                 <a
                   key={link.name}
                   href={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className="text-lg font-medium text-[var(--text-muted)] hover:text-[var(--accent)]"
+                  onClick={(e) => handleNavClick(e, link)}
+                  className="text-lg font-medium text-[var(--text-muted)] hover:text-[var(--accent)] cursor-pointer"
                 >
                   {link.name}
                 </a>
