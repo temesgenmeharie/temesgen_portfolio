@@ -6,6 +6,9 @@ import cvFile from "../assets/resume.pdf";
 const INITIAL = { from_name: "", from_email: "", subject: "", message: "" };
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
 
+// ⬇️ Must match the same flag in Hero.jsx — set to true when CV is ready
+const CV_AVAILABLE = false;
+
 function validate({ from_name, from_email, subject, message }) {
   if (!from_name.trim()) return "Please enter your name.";
   if (!from_email.trim()) return "Please enter your email.";
@@ -93,8 +96,8 @@ export default function Contact({ cvRequested = false, onCvDownloaded }) {
       setFields(INITIAL);
       setErrors({});
 
-      // If CV was requested, auto-download it after form submission
-      if (cvRequested) {
+      // If CV was requested and available, auto-download it after form submission
+      if (cvRequested && CV_AVAILABLE) {
         const link = document.createElement("a");
         link.href = cvFile;
         link.download = "Temesgen-Meharie-Resume.pdf";

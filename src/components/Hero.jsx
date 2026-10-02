@@ -7,6 +7,9 @@ import {
 } from "react-icons/si";
 
 
+// ⬇️ Set to true when your CV is ready for download. Set to false to disable.
+const CV_AVAILABLE = false;
+
 const TECH_BADGES = [
   { name: "React", icon: SiReact, color: "#61DAFB", labelColor: "#0ea5e9", bg: "rgba(97, 218, 251, 0.12)", border: "rgba(97, 218, 251, 0.25)" },
   { name: "HTML", icon: SiHtml5, color: "#E34F26", labelColor: "#E34F26", bg: "rgba(227, 79, 38, 0.1)", border: "rgba(227, 79, 38, 0.25)" },
@@ -76,13 +79,27 @@ export default function Hero({ onDownloadCvRequest }) {
 
           {/* Action Buttons */}
           <div className="flex flex-wrap gap-4 mb-8">
-            <button
-              onClick={onDownloadCvRequest}
-              className="px-6 py-2.5 bg-slate-800 border border-slate-600 text-white dark:bg-black dark:border-white/20 dark:hover:bg-white/10 dark:hover:border-white/40 hover:bg-slate-700 transition-all text-sm flex items-center gap-2 rounded-md font-medium shadow-sm hover:shadow-md cursor-pointer"
-            >
-              <FiDownload />
-              Download CV
-            </button>
+            <div className="relative group">
+              <button
+                onClick={CV_AVAILABLE ? onDownloadCvRequest : undefined}
+                disabled={!CV_AVAILABLE}
+                className={`px-6 py-2.5 border text-sm flex items-center gap-2 rounded-md font-medium shadow-sm transition-all ${
+                  CV_AVAILABLE
+                    ? "bg-slate-800 border-slate-600 text-white dark:bg-black dark:border-white/20 dark:hover:bg-white/10 dark:hover:border-white/40 hover:bg-slate-700 hover:shadow-md cursor-pointer"
+                    : "bg-slate-400 dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-200 dark:text-slate-400 cursor-not-allowed opacity-60"
+                }`}
+              >
+                <FiDownload />
+                {CV_AVAILABLE ? "Download CV" : "CV Updating Soon"}
+              </button>
+              {/* Tooltip when disabled */}
+              {!CV_AVAILABLE && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg">
+                  CV is being updated — check back soon!
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900 dark:border-t-white"></div>
+                </div>
+              )}
+            </div>
             <a
               href="#contact"
               className="px-6 py-2.5 bg-slate-800 border border-slate-600 text-white dark:bg-black dark:border-white/20 dark:hover:bg-white/10 dark:hover:border-white/40 hover:bg-slate-700 transition-all text-sm flex items-center justify-center min-w-[110px] rounded-md font-medium"
