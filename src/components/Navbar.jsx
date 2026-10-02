@@ -5,7 +5,7 @@ import { FiMenu, FiX, FiGithub, FiLinkedin, FiTwitter, FiMoon, FiSun } from "rea
 const NAV_LINKS = [
   { name: "Home", href: "#hero" },
   { name: "About", href: "#about" },
-  { name: "Resume", href: "#" },
+  { name: "Resume", href: "#contact" },
   { name: "Skills", href: "#skills" },
   { name: "Projects", href: "#projects" },
   { name: "Contact", href: "#contact" },
@@ -64,11 +64,9 @@ export default function Navbar({ onOpenResumeModal }) {
     return () => observer.disconnect();
   }, []);
 
-  const handleNavClick = (e, link) => {
-    if (link.name === "Resume") {
-      e.preventDefault();
-      onOpenResumeModal();
-      if (isOpen) setIsOpen(false);
+  const handleNavClick = (_e, link) => {
+    if (link.name === "Resume" && isOpen) {
+      setIsOpen(false);
     }
   };
 
