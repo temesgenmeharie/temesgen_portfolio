@@ -6,29 +6,29 @@ import Skills from "./components/Skills";
 import Contact from "./components/Contact";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import GmailAuthModal from "./components/GmailAuthModal";
 import "./index.css";
 
 export default function App() {
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [cvRequested, setCvRequested] = useState(false);
 
-  const handleOpenResumeModal = () => {
-    setIsAuthModalOpen(true);
+  const handleDownloadCvRequest = () => {
+    setCvRequested(true);
+    // Scroll to contact section smoothly
+    const section = document.getElementById("contact");
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
     <div className="scroll-smooth">
-      <Navbar onOpenResumeModal={handleOpenResumeModal} />
-      <Hero onOpenResumeModal={handleOpenResumeModal} />
+      <Navbar />
+      <Hero onDownloadCvRequest={handleDownloadCvRequest} />
       <About />
       <Projects />
       <Skills />
-      <Contact />
+      <Contact cvRequested={cvRequested} onCvDownloaded={() => setCvRequested(false)} />
       <Footer />
-      <GmailAuthModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-      />
     </div>
   );
-}
+}

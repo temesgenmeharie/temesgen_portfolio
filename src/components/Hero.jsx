@@ -23,7 +23,7 @@ const TECH_BADGES = [
   { name: "Flutter", icon: SiFlutter, color: "#02569B", labelColor: "#02569B", bg: "rgba(2, 86, 155, 0.1)", border: "rgba(2, 86, 155, 0.25)" },
 ];
 
-export default function Hero({ onOpenResumeModal }) {
+export default function Hero({ onDownloadCvRequest }) {
   const [isDark, setIsDark] = useState(
     document.documentElement.classList.contains("dark")
   );
@@ -77,7 +77,7 @@ export default function Hero({ onOpenResumeModal }) {
           {/* Action Buttons */}
           <div className="flex flex-wrap gap-4 mb-8">
             <button
-              onClick={onOpenResumeModal}
+              onClick={onDownloadCvRequest}
               className="px-6 py-2.5 bg-slate-800 border border-slate-600 text-white dark:bg-black dark:border-white/20 dark:hover:bg-white/10 dark:hover:border-white/40 hover:bg-slate-700 transition-all text-sm flex items-center gap-2 rounded-md font-medium shadow-sm hover:shadow-md cursor-pointer"
             >
               <FiDownload />

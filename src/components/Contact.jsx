@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiMail, FiMapPin, FiPhone, FiGithub, FiLinkedin, FiSend, FiCheckCircle, FiAlertCircle, FiLoader } from "react-icons/fi";
+import { FiMail, FiMapPin, FiPhone, FiGithub, FiLinkedin, FiSend, FiCheckCircle, FiAlertCircle, FiLoader, FiDownload } from "react-icons/fi";
+import cvFile from "../assets/resume.pdf";
 
 const INITIAL = { from_name: "", from_email: "", subject: "", message: "" };
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
@@ -15,11 +16,21 @@ function validate({ from_name, from_email, subject, message }) {
   return null;
 }
 
-export default function Contact() {
+export default function Contact({ cvRequested = false, onCvDownloaded }) {
   const [fields, setFields] = useState(INITIAL);
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState("idle"); // idle | loading | success | error
   const [errMsg, setErrMsg] = useState("");
+  const formRef = useRef(null);
+
+  // Auto-scroll to form and focus first field when CV is requested
+  useEffect(() => {
+    if (cvRequested && formRef.current) {
+      setTimeout(() => {
+        formRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 300);
+    }
+  }, [cvRequested]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -81,6 +92,17 @@ export default function Contact() {
       setStatus("success");
       setFields(INITIAL);
       setErrors({});
+
+      // If CV was requested, auto-download it after form submission
+      if (cvRequested) {
+        const link = document.createElement("a");
+        link.href = cvFile;
+        link.download = "Temesgen-Meharie-Resume.pdf";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        if (onCvDownloaded) onCvDownloaded();
+      }
     } catch (err) {
       console.error("Contact form error:", err);
       setStatus("error");
@@ -104,7 +126,7 @@ export default function Contact() {
 
       <div className="section-container relative z-10 w-full">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-10">
           <h2 className="text-4xl md:text-5xl font-bold mb-4 text-slate-900 dark:text-white transition-colors duration-300">
             Get in <span className="text-blue-500 dark:text-[#38bdf8]">Touch</span>
           </h2>
@@ -112,6 +134,30 @@ export default function Contact() {
             Have a project in mind? Fill out the form and I'll get back to you as soon as possible.
           </p>
         </div>
+
+        {/* CV Requested Banner */}
+        <AnimatePresence>
+          {cvRequested && status !== "success" && (
+            <motion.div
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              className="max-w-5xl mx-auto mb-6"
+            >
+              <div className="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700/60 rounded-2xl px-5 py-4 shadow-sm">
+                <div className="p-2 bg-emerald-100 dark:bg-emerald-900/50 rounded-xl shrink-0">
+                  <FiDownload className="text-emerald-600 dark:text-emerald-400 text-lg" />
+                </div>
+                <div>
+                  <p className="font-bold text-emerald-800 dark:text-emerald-300 text-sm">One step to get my CV!</p>
+                  <p className="text-emerald-700 dark:text-emerald-400 text-xs mt-0.5">
+                    Fill in the contact form below and your download will start automatically after submission.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-start max-w-5xl mx-auto">
 
@@ -192,6 +238,13 @@ export default function Contact() {
                   <p className="text-slate-600 dark:text-[var(--text-muted)] text-sm max-w-xs leading-relaxed">
                     Thank you for reaching out. I'll get back to you within 24 hours.
                   </p>
+                  {/* Show CV downloaded confirmation if it was requested */}
+                  {!cvRequested && (
+                    <div className="flex items-center gap-2 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50 rounded-xl px-4 py-2.5 text-emerald-700 dark:text-emerald-400 text-xs font-semibold">
+                      <FiDownload size={13} />
+                      Your CV download has started!
+                    </div>
+                  )}
                   <button
                     onClick={() => setStatus("idle")}
                     className="mt-4 px-6 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 transition-colors shadow-md"
@@ -203,6 +256,7 @@ export default function Contact() {
                 /* ── FORM STATE ── */
                 <motion.form
                   key="form"
+                  ref={formRef}
                   onSubmit={handleSubmit}
                   noValidate
                   initial={{ opacity: 0 }}
@@ -314,12 +368,21 @@ export default function Contact() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full py-4 bg-black dark:bg-white text-white dark:text-black font-bold rounded-xl shadow-md hover:bg-gray-800 dark:hover:bg-gray-200 transform hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2 mt-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+                    className={`w-full py-4 font-bold rounded-xl shadow-md transform hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2 mt-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none ${
+                      cvRequested
+                        ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                        : "bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200"
+                    }`}
                   >
                     {isLoading ? (
                       <>
                         <FiLoader className="animate-spin" size={18} />
                         Sending…
+                      </>
+                    ) : cvRequested ? (
+                      <>
+                        <FiDownload size={16} />
+                        Send & Download CV
                       </>
                     ) : (
                       <>

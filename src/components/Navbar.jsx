@@ -11,7 +11,7 @@ const NAV_LINKS = [
   { name: "Contact", href: "#contact" },
 ];
 
-export default function Navbar({ onOpenResumeModal }) {
+export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
